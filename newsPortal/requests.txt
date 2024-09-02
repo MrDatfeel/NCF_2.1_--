@@ -1,0 +1,84 @@
+python manage.py shell
+
+from django.contrib.auth.models import User
+from news.models import Author, Category, Post, Comment
+
+# 1. Создать двух пользователей с помощью метода User.objects.create_user:
+u1 = User.objects.create_user(username='user1', password='password1')
+u2 = User.objects.create_user(username='user2', password='password2')
+
+# 2. Создать два объекта модели Author, связанные с пользователями:
+a1 = Author.objects.create(user=u1)
+a2 = Author.objects.create(user=u2)
+
+# 3. Добавить 4 категории в модель Category:
+category1 = Category.objects.create(name="образование")
+category2 = Category.objects.create(name="политика")
+category3 = Category.objects.create(name="спорт")
+category4 = Category.objects.create(name="медицина")
+
+# 4. Добавить 2 статьи и 1 новость:
+post1 = Post.objects.create(title="Статья 1", content="Содержание статьи 1", type='статья', author=a1)
+post2 = Post.objects.create(title="Статья 2", content="Содержание статьи 2", type='статья', author=a2)
+post3 = Post.objects.create(title="Новость 1", content="Содержание новости 1", type='новость', author=a1)
+
+# 5. Присвоить им категории:
+post1.categories.add(category1, category2)
+post2.categories.add(category2, category3)
+post3.categories.add(category4)
+
+# 6. Создать как минимум 4 комментария к разным объектам модели Post:
+comment1 = Comment.objects.create(post=post1, user=u1, text="Комментарий к статье 1")
+comment2 = Comment.objects.create(post=post2, user=u2, text="Комментарий к статье 2")
+comment3 = Comment.objects.create(post=post3, user=u1, text="Комментарий к новости 1")
+comment4 = Comment.objects.create(post=post1, user=u2, text="Еще один комментарий к статье 1")
+
+# 7. Применить функции like() и dislike() к статьям/новостям и комментариям:
+# (предположим, что методы like() и dislike() уже определены в моделях Post и Comment)
+
+# Метод в модели Post:
+class Post(models.Model):
+    # Другие поля модели
+    
+    def like(self):
+        self.rating += 1
+        self.save()
+
+    def dislike(self):
+        self.rating -= 1
+        self.save()
+
+# Метод в модели Comment:
+class Comment(models.Model):
+    # Другие поля модели
+    
+    def like(self):
+        self.rating += 1
+        self.save()
+
+    def dislike(self):
+        self.rating -= 1
+        self.save()
+
+# 8. Обновить рейтинги пользователей (если рейтинг пользователя хранится в модели User, его нужно обновлять вручную).
+
+# 9. Вывести username и рейтинг лучшего пользователя:
+best_user = User.objects.all().order_by('-rating').first()
+print(f"Лучший пользователь: {best_user.username}, рейтинг: {best_user.rating}")
+
+# 10. Вывести информацию о лучшей статье:
+best_post = Post.objects.filter(type='статья').order_by('-rating').first()
+print(f"Дата добавления: {best_post.created_at}")
+print(f"Автор: {best_post.author.user.username}")
+print(f"Рейтинг: {best_post.rating}")
+print(f"Заголовок: {best_post.title}")
+print(f"Превью: {best_post.content[:50]}...")
+
+# 11. Вывести все комментарии к лучшей статье:
+comments_to_best_post = Comment.objects.filter(post=best_post)
+for comment in comments_to_best_post:
+    print(f"Дата: {comment.created_at}")
+    print(f"Пользователь: {comment.user.username}")
+    print(f"Рейтинг: {comment.rating}")
+    print(f"Текст: {comment.text}")
+    print("---")

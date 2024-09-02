@@ -1,0 +1,41 @@
+
+
+{% block content %}
+  <h1>Новости</h1>
+
+  <!-- Форма фильтрации -->
+  <form method="get">
+    {{ filterset.form.as_p }}
+    <button type="submit">Фильтровать</button>
+  </form>
+
+  <ul>
+    {% for article in page_obj %}
+      <li>
+        <h2>{{ article.title }}</h2>
+        <p>Автор: {{ article.author }} | Дата: {{ article.pub_date }}</p>
+        <p>{{ article.content|truncatewords:30 }}</p>
+        <a href="{% url 'news_detail' article.id %}">Читать далее</a>
+      </li>
+    {% endfor %}
+  </ul>
+
+  <!-- Пагинация -->
+  <div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?{% if filterset.form.data %}{{ filterset.form.data.urlencode }}&{% endif %}page=1">&laquo; Первая</a>
+            <a href="?{% if filterset.form.data %}{{ filterset.form.data.urlencode }}&{% endif %}page={{ page_obj.previous_page_number }}">Предыдущая</a>
+        {% endif %}
+
+        <span class="current">
+            Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?{% if filterset.form.data %}{{ filterset.form.data.urlencode }}&{% endif %}page={{ page_obj.next_page_number }}">Следующая</a>
+            <a href="?{% if filterset.form.data %}{{ filterset.form.data.urlencode }}&{% endif %}page={{ page_obj.paginator.num_pages }}">Последняя &raquo;</a>
+        {% endif %}
+    </span>
+  </div>
+{% endblock %}

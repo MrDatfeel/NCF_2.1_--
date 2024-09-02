@@ -1,0 +1,4 @@
+<p>Dear {{ user.username }},</p>
+<p>A new post has been added to the category you subscribed to:</p>
+<p><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></p>
+<p>{{ post.content|slice:":200" }}...</p>

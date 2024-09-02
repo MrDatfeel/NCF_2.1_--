@@ -1,0 +1,10 @@
+{% extends 'default.html' %}
+
+{% block title %}{{ article.title }}{% endblock %}
+
+{% block content %}
+{% load news_filters %}
+<h1>{{ article.title|censor }}</h1>
+<p>{{ article.text|censor }}</p>
+<p>{{ article.text }}</p>
+{% endblock %}
